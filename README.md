@@ -1,3 +1,7 @@
+Forked from qian-feng/Gencoding.  Genius3 is my pycharm project.
+
+----------------------------------------------------------------------------------------
+
 This project provides two components of Genius, a graph-based bug search framework. The first component is the raw feature extraction. The second is the online bug search engine.
 
 1. The raw feature extraction is designed to achieve following two goals:
