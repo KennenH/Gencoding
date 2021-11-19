@@ -126,7 +126,7 @@ def get_func_cfgs_c(ea):
 		i += 1
 		icfg = cfg.getCfg(func, externs_eas, ea_externs)
 		func_f = get_discoverRe_feature(func, icfg[0])
-		raw_g = raw_graph(funcname, icfg, func_f) #生成一个rawcfg。raw_graph是一个python class，定义在 raw_graph.py
+		raw_g = raw_graph(funcname, icfg, func_f) #生成一个rawcfg。raw_graph是一个python class，定义在 raw_graph.py.包含g（本文的ACFG）、olg_g（discovRe的acfg）、feature（函数级别的一些特征，以及betweenness）
 		raw_cfgs.append(raw_g) # raw_graphs 是另一个python class，存储raw_graph的list。定义在 raw_graph.py
 		#print(raw_g.__dict__)
 		#print(raw_g) 由于raw_graph、raw_graphs都是class，直接print只会打印<raw_graphs.raw_graphs instance at 0x09888FD0>，不能打印对象的属性。	#https://blog.51cto.com/steed/2046408 print_obj、    print(obj.__dict__)

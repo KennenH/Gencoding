@@ -1,7 +1,10 @@
 # -*- coding: UTF-8 -*-
 import itertools
 import sys
+
 sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages/')
+sys.path.insert(1, 'C:/Python27/Lib/site-packages')
+
 import networkx as nx
 #import numpy as np
 from subprocess import Popen, PIPE
@@ -72,10 +75,10 @@ class raw_graph:
 		insts = g.node[id_]['numIns']
 		feature_vec.append(insts)
 		# of LIs6
-		insts = g.node[id_]['numLIs']
+		insts = g.node[id_]['numLIs'] #
 		feature_vec.append(insts)
 		# of TIs7
-		insts = g.node[id_]['numTIs']
+		insts = g.node[id_]['numTIs'] #transfer instructions
 		feature_vec.append(insts)	
 		return feature_vec
 

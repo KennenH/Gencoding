@@ -19,10 +19,16 @@ def parse_command():
 	return args
 
 if __name__ == '__main__':
+	#E:\BaiduNetdiskDownload\IDA_Pro_v6.8\IDA_Pro_v6.8\idaq.exe -c -S"raw-feature-extractor/preprocessing_ida.py --path C:\Program1\pycharmproject\Genius3\acfgs" hpcenter
 	#print str(sys.argv) #['raw-feature-extractor/preprocessing_ida.py']
-	#print str(idc.ARGV) #['raw-feature-extractor/preprocessing_ida.py', '--path', 'C:\\Program1\\pycharmproject\\Genius3\\new']
+	#print str(idc.ARGV) #['raw-feature-extractor/preprocessing_ida.py', '--path', 'C:\\Program1\\pycharmproject\\Genius3\\acfgs']
 	#print idc.ARGV[2]
 	#print type(idc.ARGV[2])
+
+	# E:\BaiduNetdiskDownload\IDA_Pro_v6.8\IDA_Pro_v6.8\idaq.exe  -c -A -S"raw-feature-extractor/preprocessing_ida.py --path C:\Program1\pycharmproject\Genius4\acfgs" hpcenter
+	#测试生成原始特征的时间。
+	start_t = time.clock()
+
 	args = parse_command()
 	#path = args.path
 	path = idc.ARGV[2]
@@ -32,6 +38,11 @@ if __name__ == '__main__':
 	idc.SetShortPrm(idc.INF_START_AF, analysis_flags)
 	idaapi.autoWait()
 	cfgs = get_func_cfgs_c(FirstSeg())
+
+	end_t = time.clock()
+	print (end_t - start_t) #1.5934438s hpcenter 83.4 KB    #35.6745299s SCGDW698 5.5mb  #14.1480888s  762kb   SCMQTTIot     这个时间包括ida分析二进制文件的时间和脚本生成对应原始特征的时间
+	# 应该是随着函数和基本块的数量增加而线性增加的，先不写了。可能ida分析二进制文件的占比比较高
+
 	binary_name = idc.GetInputFile() + '.ida'
 	print path
 	print binary_name
@@ -39,13 +50,7 @@ if __name__ == '__main__':
 	pickle.dump(cfgs, open(fullpath,'w'))
 	#print binary_name
 
-	testpath="C:\Program1\pycharmproject\Genius3/acfgs/hpcenter.ida"
-	fr = open(fullpath,'r')
-	data1 = pickle.load(fr)
-	print(type(data1)) #<type 'instance'>
-	print(data1.raw_graph_list[393].__dict__)
-	print(data1.raw_graph_list[393].g)
-	print(data1.raw_graph_list[393].g.nodes())
-	#print_obj(data1)
-	#print cfgs.raw_graph_list[0]
+
+
+	#加上这句，脚本执行完就退出IDA
 	#idc.Exit(0)
