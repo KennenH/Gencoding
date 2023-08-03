@@ -2,24 +2,26 @@
 import itertools
 import sys
 
-sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages/')
-sys.path.insert(1, 'C:/Python27/Lib/site-packages')
+# sys.path.insert(0, '/usr/local/lib/python2.7/dist-packages/')
+# sys.path.insert(1, 'C:/Python27/Lib/site-packages')
 
 import networkx as nx
-#import numpy as np
+import numpy as np
 from subprocess import Popen, PIPE
 import pdb
 import os
-import re,mmap
-#from graph_edit_new import *
+import re
+import mmap
+# from graph_edit_new import *
 
 class raw_graph:
-	def __init__(self, funcname, g, func_f):
+	def __init__(self, funcname, g, func_f, bb_f):
 		#print "create"
 		self.funcname = funcname
 		self.old_g = g[0]
 		self.g = nx.DiGraph()
 		self.entry = g[1]
+		self.bb_features = bb_f  # len=bb数量,每个元素都是一个11维向量
 		self.fun_features = func_f
 		self.attributing()
 
@@ -54,6 +56,9 @@ class raw_graph:
 				offsprings[suc] = 1
 				self.getOffsprings(g, suc, offsprings)
 
+	# 提取acfg的属性特征
+	# 调用/传输/算术/逻辑/比较/移动/终止
+	# 数据声明/总指令数/字符串或整数常量/后代的数量
 	def retrieveVec(self, id_, g):
 		feature_vec = []
 		#numC0
@@ -96,7 +101,7 @@ class raw_graph:
 
 	def genMotifs(self, n):
 		motifs = {}
-		subgs = enumerating(n)
+		subgs = self.enumerating(n)
 		for subg in subgs:
 			if len(motifs) == 0:
 				motifs[subg] = [subg]
@@ -182,7 +187,7 @@ class raw_graph:
 			tg.updateG(fang, indexes, self.g)
 			return tg
 		pdb.set_trace()
-		print "there is g which is none"
+		print("there is g which is none")
 
 	def createG(self, binary_str, n):
 		g = nx.DiGraph()

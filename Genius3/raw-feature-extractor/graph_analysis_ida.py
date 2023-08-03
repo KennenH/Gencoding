@@ -1,3 +1,4 @@
+# coding=utf-8
 from idautils import *
 from idaapi import *
 from idc import *
@@ -138,7 +139,7 @@ def get_stackVariables(func_addr):
     return len(args)
 
 
-
+# 计算算数指令数量
 def calArithmeticIns(bl):
 	x86_AI = {'add':1, 'sub':1, 'div':1, 'imul':1, 'idiv':1, 'mul':1, 'shl':1, 'dec':1, 'inc':1}
 	mips_AI = {'add':1, 'addu':1, 'addi':1, 'addiu':1, 'mult':1, 'multu':1, 'div':1, 'divu':1}
@@ -156,6 +157,7 @@ def calArithmeticIns(bl):
 		inst_addr = NextHead(inst_addr)
 	return invoke_num
 
+# 计算调用数量
 def calCalls(bl):
 	calls = {'call':1, 'jal':1, 'jalr':1}
 	start = bl[0]
@@ -169,6 +171,7 @@ def calCalls(bl):
 		inst_addr = NextHead(inst_addr)
 	return invoke_num
 
+# 计算指令数量
 def calInsts(bl):
 	start = bl[0]
 	end = bl[1]
@@ -196,7 +199,23 @@ def calLogicInstructions(bl):
 		inst_addr = NextHead(inst_addr)
 	return invoke_num
 
+
+def calIns(bl, inst):
+	calls = {}
+	calls.update(inst)
+	start = bl[0]
+	end = bl[1]
+	invoke_num = 0
+	inst_addr = start
+	while inst_addr < end:
+		opcode = GetMnem(inst_addr)
+		if opcode in calls:
+			invoke_num += 1
+		inst_addr = NextHead(inst_addr)
+	return invoke_num
+
 def calSconstants(bl):
+	calls = {}
 	start = bl[0]
 	end = bl[1]
 	invoke_num = 0

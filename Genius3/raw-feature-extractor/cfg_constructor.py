@@ -3,12 +3,6 @@ import networkx as nx
 from idautils import *
 from idaapi import *
 from idc import *
-
-import copy
-import networkx as nx
-from idautils import *
-from idaapi import *
-from idc import *
 from graph_analysis_ida import *
 
 
@@ -99,11 +93,11 @@ def filtering(cfg):
 		bb_start = bb[0]
 		bb_end = bb[1]
 		re = remove(bb_start, bb_end)
-		print bb_id, re, bb_start, bb_end
+		print(bb_id, re, bb_start, bb_end)
 		if re:
-			print re, bb_id
+			print(re, bb_id)
 			rm_sets.append(bb_id)
-	print rm_sets
+	print(rm_sets)
 	for bb_id in rm_sets:
 		cfg.remove_node(bb_id)
 
@@ -160,16 +154,16 @@ def attributingRe(cfg, externs_eas, ea_externs):
 def attributing(cfg):
 	ga = graph_analysis()
 	ga.gwithoffspring(cfg)
-	print "finishing offspring"
+	print("finishing offspring")
 	for node in cfg:
 		stmt_num = getStmtNum(node)
 		binary_value = getBinaryValue(node)
 		cfg.node[node]['stmt_num'] = stmt_num
 		cfg.node[node]['binary_value'] = binary_value
 	ga.domChecking(cfg)
-	print "finishing domChecking"
+	print("finishing domChecking")
 	ga.loopChecking(cfg)
-	print "finishing loopChecking"
+	print("finishing loopChecking")
 
 
 def getStmtNum(node):
@@ -190,17 +184,17 @@ def getBinaryValue(node):
 	for x in xrange((inst_addr - start)-1):
 		addr = start + x
 		y = GetOriginalByte(addr)
-		print value, addr, y
+		print(value, addr, y)
 		value = value | y
 		value = value << 8
-		print value
+		print(value)
 
 	addr = inst_addr - 1
 	y = GetOriginalByte(addr)
-	print value, addr, y
+	print(value, addr, y)
 	value = value | y
-	print node
-	print bin(value)
+	print(node)
+	print(bin(value))
 	return value
 
 

@@ -1450,11 +1450,7 @@ def PatchByte(ea, value):
     @param ea: linear address
     @param value: new value of the byte
 
-    @return: 1 if the database has been modified,
-             0 if either the debugger is running and the process' memory
-               has value 'value' at address 'ea',
-               or the debugger is not running, and the IDB
-               has value 'value' at address 'ea already.
+    @return: 1 if successful, 0 if not
     """
     return idaapi.patch_byte(ea, value)
 
@@ -1466,11 +1462,7 @@ def PatchWord(ea, value):
     @param ea: linear address
     @param value: new value of the word
 
-    @return: 1 if the database has been modified,
-             0 if either the debugger is running and the process' memory
-               has value 'value' at address 'ea',
-               or the debugger is not running, and the IDB
-               has value 'value' at address 'ea already.
+    @return: 1 if successful, 0 if not
     """
     return idaapi.patch_word(ea, value)
 
@@ -1482,29 +1474,9 @@ def PatchDword(ea, value):
     @param ea: linear address
     @param value: new value of the double word
 
-    @return: 1 if the database has been modified,
-             0 if either the debugger is running and the process' memory
-               has value 'value' at address 'ea',
-               or the debugger is not running, and the IDB
-               has value 'value' at address 'ea already.
+    @return: 1 if successful, 0 if not
     """
     return idaapi.patch_long(ea, value)
-
-
-def PatchQword(ea, value):
-    """
-    Change value of a quad word
-
-    @param ea: linear address
-    @param value: new value of the quad word
-
-    @return: 1 if the database has been modified,
-             0 if either the debugger is running and the process' memory
-               has value 'value' at address 'ea',
-               or the debugger is not running, and the IDB
-               has value 'value' at address 'ea already.
-    """
-    return idaapi.patch_qword(ea, value)
 
 
 def SetFlags(ea, flags):
@@ -1908,7 +1880,7 @@ def GetFloat(ea):
     Get value of a floating point number (4 bytes)
     This function assumes number stored using IEEE format
     and in the same endianness as integers.
-
+    
     @param ea: linear address
 
     @return: float
@@ -2281,7 +2253,7 @@ def GetOpnd(ea, n):
 
     @return: the current text representation of operand or ""
     """
-
+    
     if not isCode(idaapi.get_flags_novalue(ea)):
         return ""
 
@@ -2308,21 +2280,21 @@ def GetOpType(ea, n):
     return -1 if inslen == 0 else idaapi.cmd.Operands[n].type
 
 
-o_void     = idaapi.o_void      # No Operand                           ----------
-o_reg      = idaapi.o_reg       # General Register (al,ax,es,ds...)    reg
-o_mem      = idaapi.o_mem       # Direct Memory Reference  (DATA)      addr
-o_phrase   = idaapi.o_phrase    # Memory Ref [Base Reg + Index Reg]    phrase
-o_displ    = idaapi.o_displ     # Memory Reg [Base Reg + Index Reg + Displacement] phrase+addr
-o_imm      = idaapi.o_imm       # Immediate Value                      value
-o_far      = idaapi.o_far       # Immediate Far Address  (CODE)        addr
-o_near     = idaapi.o_near      # Immediate Near Address (CODE)        addr
-o_idpspec0 = idaapi.o_idpspec0  # Processor specific type
-o_idpspec1 = idaapi.o_idpspec1  # Processor specific type
-o_idpspec2 = idaapi.o_idpspec2  # Processor specific type
-o_idpspec3 = idaapi.o_idpspec3  # Processor specific type
-o_idpspec4 = idaapi.o_idpspec4  # Processor specific type
-o_idpspec5 = idaapi.o_idpspec5  # Processor specific type
-                                # There can be more processor specific types
+o_void     =  idaapi.o_void      #  No Operand                           ----------
+o_reg      =  idaapi.o_reg       #  General Register (al,ax,es,ds...)    reg
+o_mem      =  idaapi.o_mem       #  Direct Memory Reference  (DATA)      addr
+o_phrase   =  idaapi.o_phrase    #  Memory Ref [Base Reg + Index Reg]    phrase
+o_displ    =  idaapi.o_displ     #  Memory Reg [Base Reg + Index Reg + Displacement] phrase+addr
+o_imm      =  idaapi.o_imm       #  Immediate Value                      value
+o_far      =  idaapi.o_far       #  Immediate Far Address  (CODE)        addr
+o_near     =  idaapi.o_near      #  Immediate Near Address (CODE)        addr
+o_idpspec0 =  idaapi.o_idpspec0  #  IDP specific type
+o_idpspec1 =  idaapi.o_idpspec1  #  IDP specific type
+o_idpspec2 = idaapi.o_idpspec2  #  IDP specific type
+o_idpspec3 = idaapi.o_idpspec3  #  IDP specific type
+o_idpspec4 = idaapi.o_idpspec4  #  IDP specific type
+o_idpspec5 = idaapi.o_idpspec5  #  IDP specific type
+o_last     = idaapi.o_last      #  first unused type
 
 # x86
 o_trreg  =       idaapi.o_idpspec0      # trace register
@@ -2336,7 +2308,7 @@ o_xmmreg  =      idaapi.o_idpspec5      # xmm register
 o_reglist  =     idaapi.o_idpspec1      # Register list (for LDM/STM)
 o_creglist  =    idaapi.o_idpspec2      # Coprocessor register list (for CDP)
 o_creg  =        idaapi.o_idpspec3      # Coprocessor register (for LDC/STC)
-o_fpreg_arm  =   idaapi.o_idpspec4      # Floating point register
+o_fpreg  =       idaapi.o_idpspec4      # Floating point register
 o_fpreglist  =   idaapi.o_idpspec5      # Floating point register list
 o_text  =        (idaapi.o_idpspec5+1)  # Arbitrary text stored in the operand
 
@@ -3144,20 +3116,6 @@ def Message(msg):
     idaapi.msg(msg)
 
 
-def UMessage(msg):
-    """
-    Display an UTF-8 string in the message window
-
-    The result of the stringification of the arguments
-    will be treated as an UTF-8 string.
-
-    @param msg: message to print (formatting is done in Python)
-
-    This function can be used to debug IDC scripts
-    """
-    idaapi.umsg(msg)
-
-
 def Warning(msg):
     """
     Display a message in a message box
@@ -3632,7 +3590,7 @@ def GetSegmentAttr(segea, attr):
     seg = idaapi.getseg(segea)
     assert seg, "could not find segment at 0x%x" % segea
     if attr in [ SEGATTR_ES, SEGATTR_CS, SEGATTR_SS, SEGATTR_DS, SEGATTR_FS, SEGATTR_GS ]:
-        return idaapi.get_defsr(seg, _SEGATTRMAP[attr][1])
+        return idaapi.get_defsr(seg, _SEGATTRMAP[attr])
     else:
         return _IDC_GetAttr(seg, _SEGATTRMAP, attr)
 
@@ -3651,7 +3609,7 @@ def SetSegmentAttr(segea, attr, value):
     seg = idaapi.getseg(segea)
     assert seg, "could not find segment at 0x%x" % segea
     if attr in [ SEGATTR_ES, SEGATTR_CS, SEGATTR_SS, SEGATTR_DS, SEGATTR_FS, SEGATTR_GS ]:
-        idaapi.set_defsr(seg, _SEGATTRMAP[attr][1], value)
+        idaapi.set_defsr(seg, _SEGATTRMAP[attr], value)
     else:
         _IDC_SetAttr(seg, _SEGATTRMAP, attr, value)
     return seg.update()
@@ -3995,11 +3953,7 @@ def SaveFile(filepath, pos, ea, size):
 
     @return: 0 - error, 1 - ok
     """
-    if ( os.path.isfile(filepath) ):
-        of = idaapi.fopenM(filepath)
-    else:
-        of = idaapi.fopenWB(filepath)
-
+    of = idaapi.fopenM(filepath)
 
     if of:
         retval = idaapi.base2file(of, pos, ea, ea+size)
@@ -5588,23 +5542,6 @@ def SetMemberComment(sid, member_offset, comment, repeatable):
     return idaapi.set_member_cmt(m, comment, repeatable)
 
 
-def ExpandStruc(sid, offset, delta, recalc):
-    """
-    Expand or shrink a structure type
-    @param id: structure type ID
-    @param offset: offset in the structure
-    @param delta: how many bytes to add or remove
-    @param recalc: recalculate the locations where the structure
-                               type is used
-    @return: != 0 - ok
-    """
-    s = idaapi.get_struc(sid)
-    if not s:
-        return 0
-
-    return idaapi.expand_struc(s, offset, delta, recalc)
-
-
 def GetFchunkAttr(ea, attr):
     """
     Get a function chunk attribute
@@ -6980,16 +6917,16 @@ def ApplyType(ea, py_type, flags = TINFO_DEFINITE):
     @return: Boolean
     """
 
-    if py_type is None:
-        py_type = ""
-    if isinstance(py_type, basestring) and len(py_type) == 0:
-        pt = ("", "")
-    else:
+    if py_type != None:
         if len(py_type) == 3:
           pt = py_type[1:]      # skip name component
         else:
           pt = py_type
-    return idaapi.apply_type(idaapi.cvar.idati, pt[0], pt[1], ea, flags)
+        return idaapi.apply_type(idaapi.cvar.idati, pt[0], pt[1], ea, flags)
+    if idaapi.has_ti(ea):
+        idaapi.del_tinfo(ea)
+        return True
+    return False
 
 def SetType(ea, newtype):
     """
@@ -7004,7 +6941,7 @@ def SetType(ea, newtype):
     @return: 1-ok, 0-failed.
     """
     if newtype is not '':
-        pt = ParseType(newtype, 1) # silent
+        pt = ParseType(newtype, 0)
         if pt is None:
           # parsing failed
           return None
