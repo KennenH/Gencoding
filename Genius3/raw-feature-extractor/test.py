@@ -63,8 +63,22 @@ def clock():
         subprocess.call('taskkill /im idaq64.exe /f')
 
 
+def delete_error():
+    for workflow in range(0, 35):
+        convert_log_path = "D:\\hkn\\infected\\datasets\\logging\\convert_process_log{}.log".format(workflow)
+        json_dir = "D:\\hkn\\infected\\datasets\\virusshare_infected{}_json".format(workflow)
+
+        with open(convert_log_path, 'r') as log:
+            for line in log:
+                if 'Error occurred' in line:
+                    name = line[line.find(',') + 2: line.find('.')] + '.jsonl'
+                    # print(os.path.join(json_dir, name))
+                    if os.path.exists(os.path.join(json_dir, name)):
+                        os.remove(os.path.join(json_dir, name))
+
+
 if __name__ == '__main__':
     # gen_dir()
     # change_max_item_lines()
-    subprocess.call('taskkill /im idaq64.exe /f')
-
+    # subprocess.call('taskkill /im idaq64.exe /f')
+    delete_error()
