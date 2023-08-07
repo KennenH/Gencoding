@@ -15,8 +15,8 @@ def call_preprocess(cmd_line):
     subprocess.call(cmd_line, shell=True)
 
 
-def batch_mode():
-    for workflow in range(1, 20):
+def batch_mode(start, end):
+    for workflow in range(start, end):
         # workflow = 0
         pe_dir = 'D:\\hkn\\infected\\datasets\\virusshare_infected{}'.format(workflow)
         # for test
@@ -38,8 +38,7 @@ def batch_mode():
                 # for test
                 # cmd_line = r'idaq64 -c -A -S"D:\hkn\project_folder\Gencoding3\Genius3\raw-feature-extractor\preprocessing_ida.py {}" -oF:\iout {}'.format(
                 #     workflow, os.path.join(pe_dir, pe))
-                cmd_line = r'idaq64 -c -A -S"D:\hkn\project_folder\Gencoding3\Genius3\raw-feature-extractor\preprocessing_ida.py {}" -oF:\iout {}'.format(
-                    workflow, os.path.join(pe_dir, pe))
+                cmd_line = r'idaq64 -c -A -S"D:\hkn\project_folder\Gencoding3\Genius3\raw-feature-extractor\preprocessing_ida.py {}" -oF:\iout {}'.format(workflow, os.path.join(pe_dir, pe))
 
                 p = multiprocessing.Process(target=call_preprocess, args=[cmd_line])
                 p.start()
@@ -54,8 +53,7 @@ def batch_mode():
 
                 if flag_kill:
                     subprocess.call('taskkill /im idaq64.exe /f')
-                    process_log.write(
-                        "index {}, {} in workflow {} stuck, process terminated.\n".format(index, pe, workflow))
+                    process_log.write("index {}, {} in workflow {} stuck, process terminated.\n".format(index, pe, workflow))
                 else:
                     # 正常运行结束
                     log.truncate(0)
@@ -63,16 +61,17 @@ def batch_mode():
                     log.write(str(index))
                     log.flush()
                     process_log.write("index {}, {} process done.\n".format(index, pe))
-    # 一次workflow结束后将所有副产物删除
-    delete_output()
+        # 一次workflow结束后将所有副产物删除
+        delete_output()
 
 
 def delete_output():
     out_dir = 'F:\\iout'
-    os.rmdir(out_dir)
-    os.mkdir(out_dir)
+    for f in os.listdir(out_dir):
+        os.remove(f)
 
 
 # 注意：该py文件必须放在IDA的根目录下，且必须使用cmd命令执行，否则无法链接到python库
+# F:\\kkk\\IDA_6.6
 if __name__ == '__main__':
-    batch_mode()
+    batch_mode(20, 35)
