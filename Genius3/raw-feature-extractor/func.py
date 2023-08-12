@@ -139,7 +139,7 @@ def get_func_cfgs_c(ea):
         icfg = cfg.getCfg(func, externs_eas, ea_externs)
         func_f = get_discoverRe_feature(func, icfg[0])
         bb_f = get_bb_features(func)
-        raw_g = raw_graph(funcname, icfg, func_f, bb_f)  # todo 为每个bb生成bb_features
+        raw_g = raw_graph(funcname, icfg, func_f, bb_f)
         raw_cfgs.append(raw_g) # raw_graphs 是另一个python class，存储raw_graph的list。定义在 raw_graph.py
         #print(raw_g.__dict__)
         #print(raw_g) 由于raw_graph、raw_graphs都是class，直接print只会打印<raw_graphs.raw_graphs instance at 0x09888FD0>，不能打印对象的属性。	#https://blog.51cto.com/steed/2046408 print_obj、    print(obj.__dict__)

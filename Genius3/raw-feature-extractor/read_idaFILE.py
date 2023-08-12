@@ -15,7 +15,7 @@ def print_obj(obj):
 # sub_10F20 308  反编译代码有字符串，但是这个特征提取里没有字符串 constant，可能是间接引用的，不识别。看了下所有函数的特征，几乎都没有字符串常量，可能都是写在别的地方然后引用的。
 # sub_166C4 393
 if __name__ == '__main__':
-    testpath = "D:\\hkn\\infected\\datasets\\virusshare_infected11_cfg\\VirusShare_5c088a2a6e0391b7c6ab22e4648eab3a.ida"
+    testpath = "D:\\hkn\\infected\\datasets\\virusshare_infected23_cfg\\VirusShare_9ba64176b2ca61212ff56a5b4eb546ff.ida"
     fr = open(testpath, 'r')
     data = pickle.load(fr) #一个二进制文件的acfgs
     fr.close()
