@@ -55,7 +55,7 @@ def convert(start, end):
                             elif 'label' in line:
                                 functions_list.append(line[line.find('= "') + 3:line.find('",')])
 
-                    # 没有内部函数被检测到，保险起见还是不要这数据了
+                    # 没有内部函数被检测到，正常来说不应该，保险起见还是不要这数据了
                     if raw_function_edges.__len__() == 0:
                         continue
 
@@ -113,4 +113,4 @@ def convert(start, end):
 
 
 if __name__ == '__main__':
-    convert(0, 35)
+    convert(35, 69)

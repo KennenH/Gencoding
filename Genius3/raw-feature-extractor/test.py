@@ -6,6 +6,7 @@ import time
 import json
 import random
 import shutil
+from tqdm import tqdm
 
 
 def func():
@@ -25,19 +26,25 @@ def func1():
 
 def create_dir():
     parent_dir = "D:\\hkn\\infected\\datasets"
-    for workflow in range(35, 40):
+    for workflow in range(40, 70):
         # 生成raw data文件夹
-        # infected = "virusshare_infected{}".format(workflow)
-        # cfg = "virusshare_infected{}_cfg".format(workflow)
-        # dot = "virusshare_infected{}_dot".format(workflow)
+        infected = "virusshare_infected{}".format(workflow)
+        cfg = "virusshare_infected{}_cfg".format(workflow)
+        dot = "virusshare_infected{}_dot".format(workflow)
         jsonl = "virusshare_infected{}_json".format(workflow)
-        # os.mkdir(os.path.join(parent_dir, infected))
-        # os.mkdir(os.path.join(parent_dir, cfg))
-        # os.mkdir(os.path.join(parent_dir, dot))
-        os.mkdir(os.path.join(parent_dir, jsonl))
+        create(parent_dir, infected)
+        create(parent_dir, cfg)
+        create(parent_dir, dot)
+        create(parent_dir, jsonl)
         # iout = "virusshare_infected{}_iout".format(workflow)
         # os.rmdir(os.path.join(parent_dir, iout))
         # os.rmdir(os.path.join(parent_dir, ida))
+
+
+def create(parent_dir, folder):
+    if not os.path.exists(os.path.join(parent_dir, folder)):
+        os.mkdir(os.path.join(parent_dir, folder))
+
 
 
 def change_max_item_lines():
@@ -82,7 +89,7 @@ def delete_error():
 
 
 def check_json():
-    for workflow in range(5, 16):
+    for workflow in tqdm(range(0, 69)):
         json_dir = 'D:\\hkn\\infected\\datasets\\virusshare_infected{}_json'.format(workflow)
         for json_file in os.listdir(json_dir):
             f = open(os.path.join(json_dir, json_file), 'r')
@@ -183,6 +190,22 @@ def read_test():
                 print(line[line.find('= "') + 3:line.find('",')])
 
 
+# 临时工具，有些pe文件没有经过api分类，直接删掉
+def del_redundant():
+    for workflow in range(0, 68):
+        pe_dir = 'D:\\hkn\\infected\\datasets\\virusshare_infected{}'.format(workflow)
+        family_file_path = 'D:\\hkn\\infected\\datasets\\virusshare_family\\virusshare_family{}.txt'.format(workflow)
+
+        with open(family_file_path, 'r') as f_file:
+            family = f_file.read()
+            for name in os.listdir(pe_dir):
+                if name[11:] in family:
+                    continue
+                else:
+                    # print(name)
+                    os.remove(os.path.join(pe_dir, name))
+
+
 if __name__ == '__main__':
     # create_dir()
     # change_max_item_lines()
@@ -192,8 +215,9 @@ if __name__ == '__main__':
     # delete_jsonl()
     # check_json()
     split_samples()
-    rename()
+    # rename()
     # half_divide()
     # copy_train_data()
     # clear_dot()
     # read_test()
+    # del_redundant()
