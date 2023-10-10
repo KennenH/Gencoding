@@ -1,11 +1,8 @@
 # -*- coding: UTF-8 -*-
 import pickle
 from func import *
-from raw_graphs import *
 from idc import *
-import idautils
 import os
-import sys
 
 
 def preprocess():
@@ -18,9 +15,13 @@ def preprocess():
     binary_name = idc.GetInputFile()
 
     workflow = idc.ARGV[1]
-    # workflow = 0
-    cfg_path = "D:\\hkn\\infected\\datasets\\virusshare_infected{}_cfg".format(workflow)
-    gdl_path = "D:\\hkn\\infected\\datasets\\virusshare_infected{}_dot\\{}.dot".format(workflow, binary_name)
+    # workflow为特定值时分析良性软件，否则分析恶意软件
+    if workflow == '-1':
+        cfg_path = "D:\\hkn\\infected\\datasets\\benign_cfg\\new"
+        gdl_path = "D:\\hkn\\infected\\datasets\\benign_dot\\new\\{}.dot".format(binary_name)
+    else:
+        cfg_path = "D:\\hkn\\infected\\datasets\\virusshare_infected{}_cfg".format(workflow)
+        gdl_path = "D:\\hkn\\infected\\datasets\\virusshare_infected{}_dot\\{}.dot".format(workflow, binary_name)
 
     analysis_flags = idc.GetShortPrm(idc.INF_START_AF)
     analysis_flags &= ~idc.AF_IMMOFF

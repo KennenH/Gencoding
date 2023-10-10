@@ -46,7 +46,6 @@ def create(parent_dir, folder):
         os.mkdir(os.path.join(parent_dir, folder))
 
 
-
 def change_max_item_lines():
     f = open("F:\\kkk\\IDA_6.6\\cfg\\ida.cfg", 'rb')
     s = f.read()
@@ -89,6 +88,7 @@ def delete_error():
 
 
 def check_json():
+    print('start checking json')
     for workflow in tqdm(range(0, 69)):
         json_dir = 'D:\\hkn\\infected\\datasets\\virusshare_infected{}_json'.format(workflow)
         for json_file in os.listdir(json_dir):
@@ -99,9 +99,13 @@ def check_json():
                 continue
             finally:
                 f.close()
-            for acfg in data['acfg_list']:
-                if acfg['block_number'] != len(acfg['block_features']):
-                    print("{} {}\n".format(workflow, json_file))
+
+            if len(data['function_edges'][0]) == 0:
+                print("{} {} function_edges null\n".format(workflow, json_file))
+                # continue
+            # for acfg in data['acfg_list']:
+            #     if acfg['block_number'] != len(acfg['block_features']):
+            #         print("{} {}\n".format(workflow, json_file))
 
 
 # 临时函数，删除所有jsonl文件
@@ -112,21 +116,44 @@ def delete_jsonl():
             os.remove(os.path.join(json_dir, f))
 
 
-# 临时函数，重命名pt文件使之与代码相符
-def rename():
+def delete_all_local():
+    src = 'D:\\hkn\\infected\\datasets\\proprecessed_pt'
+    dirs = ['train_malware', 'test_malware', 'valid_malware', 'train_benign', 'test_benign', 'valid_benign',
+            'train_malware_backup', 'test_malware_backup', 'valid_malware_backup']
+    for d in dirs:
+        path = os.path.join(src, d)
+        for f in os.listdir(path):
+            os.remove(os.path.join(path, f))
+
+
+# 重命名pt文件使之与代码相符
+def rename(mal_or_be, postfix):
     tag_set = ['train', 'test', 'valid']
     for tag in tag_set:
-        data_dir = 'D:/hkn/infected/datasets/proprecessed_pt/{}_malware/'.format(tag)
+        data_dir = 'D:/hkn/infected/datasets/proprecessed_pt/{}_{}{}/'.format(tag, mal_or_be, postfix)
         for index, f in enumerate(os.listdir(data_dir)):
             os.rename(os.path.join(data_dir, f), os.path.join(data_dir, 'm' + f))
     for tag in tag_set:
-        data_dir = 'D:/hkn/infected/datasets/proprecessed_pt/{}_malware/'.format(tag)
+        data_dir = 'D:/hkn/infected/datasets/proprecessed_pt/{}_{}{}/'.format(tag, mal_or_be, postfix)
         for index, f in enumerate(os.listdir(data_dir)):
-            os.rename(os.path.join(data_dir, f), os.path.join(data_dir, 'malware_{}.pt'.format(index)))
+            os.rename(os.path.join(data_dir, f), os.path.join(data_dir, '{}_{}.pt'.format(mal_or_be, index)))
 
 
-def split_samples():
-    path = 'D:\\hkn\\infected\\datasets\\proprecessed_pt\\all'
+def split_samples(flag):
+    postfix = ''
+    if flag == 'one_family':
+        path = 'D:\\hkn\\infected\\datasets\\proprecessed_pt\\one_family_malware'
+        tag = 'malware'
+    elif flag == 'standard':
+        path = 'D:\\hkn\\infected\\datasets\\proprecessed_pt\\all'
+        postfix = '_backup'
+        tag = 'malware'
+    elif flag == 'benign':
+        path = 'D:\\hkn\\infected\\datasets\\proprecessed_pt\\all_benign'
+        tag = 'benign'
+    else:
+        return
+
     out = 'D:\\hkn\\infected\\datasets\\proprecessed_pt'
     os_list = os.listdir(path)
     random.shuffle(os_list)
@@ -135,11 +162,12 @@ def split_samples():
     test_len = int(train_len / 8)
     for index, f in enumerate(os_list):
         if index < train_len:
-            shutil.copy(os.path.join(path, f), os.path.join(out, 'train_malware'))
+            shutil.copy(os.path.join(path, f), os.path.join(out, 'train_{}'.format(tag) + postfix))
         elif train_len <= index < train_len + test_len:
-            shutil.copy(os.path.join(path, f), os.path.join(out, 'test_malware'))
+            shutil.copy(os.path.join(path, f), os.path.join(out, 'test_{}'.format(tag) + postfix))
         else:
-            shutil.copy(os.path.join(path, f), os.path.join(out, 'valid_malware'))
+            shutil.copy(os.path.join(path, f), os.path.join(out, 'valid_{}'.format(tag) + postfix))
+    rename(tag, postfix)
 
 
 def half_divide():
@@ -206,6 +234,19 @@ def del_redundant():
                     os.remove(os.path.join(pe_dir, name))
 
 
+def delete_pe():
+    dot_dir = 'D:\\hkn\\infected\\datasets\\benign_dot'
+    cfg_dir = 'D:\\hkn\\infected\\datasets\\benign_cfg'
+    dot_list = os.listdir(dot_dir)
+    for cfg in os.listdir(cfg_dir):
+        name = cfg[:-4] + ".dot"
+        if name in dot_list:
+            continue
+        else:
+            print(os.path.join(dot_dir, name))
+            # os.remove(os.path.join(dot_dir, cfg))
+
+
 if __name__ == '__main__':
     # create_dir()
     # change_max_item_lines()
@@ -213,9 +254,20 @@ if __name__ == '__main__':
     # delete_error()
     # test()
     # delete_jsonl()
+    delete_all_local()
     # check_json()
-    split_samples()
-    # rename()
+    # delete_pe()
+
+    # rename('malware', '_backup')
+
+    # 指定 'standard' or 'benign' or 'one_family'
+    # standard表示处理所有恶意样本
+    # split_samples('standard')
+    # one_family表示仅处理一个家族，仅用于测试原模型的二分类
+    # split_samples('one_family')
+    # benign表示处理良性样本
+    # split_samples('benign')
+
     # half_divide()
     # copy_train_data()
     # clear_dot()
