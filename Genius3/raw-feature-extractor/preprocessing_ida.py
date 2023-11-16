@@ -17,11 +17,13 @@ def preprocess():
     workflow = idc.ARGV[1]
     # workflow为特定值时分析良性软件，否则分析恶意软件
     if workflow == '-1':
-        cfg_path = "D:\\hkn\\infected\\datasets\\benign_cfg\\new"
-        gdl_path = "D:\\hkn\\infected\\datasets\\benign_dot\\new\\{}.dot".format(binary_name)
+        cfg_path = "F:\\kkk\\dataset\\benign\\refind_cfg\\{}.ida".format(binary_name)
+        gdl_path = "F:\\kkk\\dataset\\benign\\refind_dot\\{}.dot".format(binary_name)
+        asm_path = "F:\\kkk\\dataset\\benign\\refind_asm\\{}.asm".format(binary_name)
     else:
-        cfg_path = "D:\\hkn\\infected\\datasets\\virusshare_infected{}_cfg".format(workflow)
+        cfg_path = "D:\\hkn\\infected\\datasets\\virusshare_infected{}_cfg\\{}.ida".format(workflow, binary_name)
         gdl_path = "D:\\hkn\\infected\\datasets\\virusshare_infected{}_dot\\{}.dot".format(workflow, binary_name)
+        asm_path = "D:\\hkn\\infected\\datasets\\virusshare_infected{}_asm\\{}.asm".format(workflow, binary_name)
 
     analysis_flags = idc.GetShortPrm(idc.INF_START_AF)
     analysis_flags &= ~idc.AF_IMMOFF
@@ -30,14 +32,17 @@ def preprocess():
 
     # 生成pe文件的cfg列表
     cfgs = get_func_cfgs_c(FirstSeg())
-    # 生成pe文件的fcg
+    # 将cfg保存为.ida
+    pickle.dump(cfgs, open(cfg_path, 'w'))
+
+    # 生成pe文件的fcg，保存为.dot文件
     # idc.GenCallGdl(gdl_path, 'Call Gdl', idc.CHART_GEN_GDL) 这个生成gdl文件，网上几乎找不到gdl这个格式
     idc.GenCallGdl(gdl_path, 'Call Gdl', idaapi.CHART_GEN_DOT)
 
-    full_path = os.path.join(cfg_path, binary_name + '.ida')
-    pickle.dump(cfgs, open(full_path, 'w'))
+    # 生成.asm文件
+    idc.GenerateFile(idc.OFILE_ASM, asm_path, 0, idc.BADADDR, 0)
 
-    # 由于命令行模式也必须打开ida pro，因此每次结束自动关闭ida
+    # 关闭IDA Pro
     idc.Exit(0)
 
 

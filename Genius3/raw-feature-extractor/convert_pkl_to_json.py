@@ -119,9 +119,9 @@ def convert(start, end, overhaul):
 
 
 def convert_benign(overhaul):
-    cfg_dir = "D:\\hkn\\infected\\datasets\\benign_cfg\\new"
-    output_dir = "D:\\hkn\\infected\\datasets\\benign_json\\new"
-    dot_dir = "D:\\hkn\\infected\\datasets\\benign_dot\\new"
+    cfg_dir = "F:\\kkk\\dataset\\benign\\refind_cfg"
+    dot_dir = "F:\\kkk\\dataset\\benign\\refind_dot"
+    output_dir = "F:\\kkk\\dataset\\benign\\refind_jsonl"
 
     log_path = "D:\\hkn\\infected\\datasets\\logging\\convert_benign_log.log"
     process_log_path = "D:\\hkn\\infected\\datasets\\logging\\convert_benign_process_log{}.log"
@@ -139,7 +139,8 @@ def convert_benign(overhaul):
         else:
             log_index = int(logged)
 
-        for index, cfg in enumerate(tqdm(os.listdir(cfg_dir))):
+        cdg_list = os.listdir(cfg_dir)
+        for index, cfg in enumerate(tqdm(cdg_list)):
             if index < log_index:
                 continue
 
@@ -153,6 +154,8 @@ def convert_benign(overhaul):
             except ValueError:
                 process_log.write("index {}, {} process failed. ValueError occurred.\n".format(index, cfg))
                 continue
+            except KeyError:
+                process_log.write("index {}, {} process failed. KeyError occurred.\n".format(index, cfg))
             finally:
                 cfg_file.close()
 
@@ -230,4 +233,4 @@ def convert_benign(overhaul):
 
 if __name__ == '__main__':
     # convert(35, 69)
-    convert_benign(True)
+    convert_benign(False)

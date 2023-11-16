@@ -26,7 +26,7 @@ def benign_batch_mode(overhaul):
 
     log_path = 'D:\\hkn\\infected\\datasets\\logging\\ida_log_benign.log'
     process_log_path = 'D:\\hkn\\infected\\datasets\\logging\\ida_process_log_benign.log'
-    benign_pe_dir = 'D:\\hkn\\infected\\datasets\\benign\\new'
+    benign_pe_dir = 'F:\\kkk\\dataset\\benign\\refind'
 
     if overhaul:
         if os.path.exists(log_path):
@@ -41,7 +41,8 @@ def benign_batch_mode(overhaul):
         else:
             log_index = int(logged)
 
-        for index, pe in enumerate(tqdm(sorted(os.listdir(benign_pe_dir)))):
+        pe_list = os.listdir(benign_pe_dir)
+        for index, pe in enumerate(tqdm(sorted(pe_list))):
             if index < log_index:
                 continue
 
@@ -78,7 +79,7 @@ def benign_batch_mode(overhaul):
     print('总失败数{}'.format(total_failed))
 
 
-def mal_batch_mode(start, end):
+def mal_batch_mode(start, end, overhaul):
     # 只选其中这些类的pe进行分析，其他的就直接跳过
     families_need_to_analyze = {'wacatac': 0, 'glupteba': 0, 'ulpm': 0, 'fugrafa': 0, 'tiggre': 0,
                                 'redcap': 0, 'generickdz': 0, 'berbew': 0, 'agenttesla': 0, 'lazy': 0}
@@ -94,6 +95,13 @@ def mal_batch_mode(start, end):
         family_path = 'D:\\hkn\\infected\\datasets\\virusshare_family\\virusshare_family{}.txt'.format(workflow)
         log_path = 'D:\\hkn\\infected\\datasets\\logging\\ida_log{}.log'.format(workflow)
         process_log_path = 'D:\\hkn\\infected\\datasets\\logging\\ida_process_log{}.log'.format(workflow)
+
+        if overhaul:
+            if os.path.exists(log_path):
+                os.remove(log_path)
+            if os.path.exists(process_log_path):
+                os.remove(process_log_path)
+
         with open(log_path, 'a+') as log, open(process_log_path, 'a+') as process_log, open(family_path,
                                                                                             'r') as family_file:
             logged = log.readline()
@@ -165,8 +173,28 @@ def delete_output():
             os.remove(os.path.join(out_dir, f))
 
 
+def generate_asm_batch_mode():
+    pe_dir = 'F:\\kkk\\dataset\\benign\\refind'
+    pe_list = os.listdir(pe_dir)
+    for pe in tqdm(pe_list):
+        cmd_line = r'idaq64 -c -A -S"D:\hkn\project_folder\Gencoding3\Genius3\raw-feature-extractor\generate_asm_file.py" -oF:\iout {}'.format(
+            os.path.join(pe_dir, pe))
+
+        p = multiprocessing.Process(target=call_preprocess, args=[cmd_line])
+        p.start()
+        while True:
+            if not p.is_alive():
+                break
+            else:
+                time.sleep(1)
+
+    delete_output()
+
+
 # 注意：该py文件必须放在IDA的根目录下，且必须使用cmd命令执行，否则无法链接到python库
 # F:\\kkk\\IDA_6.6
 if __name__ == '__main__':
     benign_batch_mode(True)
-    # mal_batch_mode(35, 69)
+    # mal_batch_mode(35, 69, True)
+    # generate_asm_batch_mode()
+

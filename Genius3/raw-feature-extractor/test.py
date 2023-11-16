@@ -7,6 +7,7 @@ import json
 import random
 import shutil
 from tqdm import tqdm
+import csv
 
 
 def func():
@@ -247,14 +248,45 @@ def delete_pe():
             # os.remove(os.path.join(dot_dir, cfg))
 
 
+def delete_error_benign():
+    jsonl_dir = 'F:\\kkk\\dataset\\benign\\refind_jsonl'
+    dot_dir = 'F:\\kkk\\dataset\\benign\\refind_dot'
+    cfg_dir = "F:\\kkk\\dataset\\benign\\refind_cfg"
+    asm_dir = "F:\\kkk\\dataset\\benign\\refind_asm"
+    pe_dir = "F:\\kkk\\dataset\\benign\\refind"
+    alist = os.listdir(pe_dir)
+    for f in alist:
+        if not os.path.exists(os.path.join(jsonl_dir, f + '.jsonl')):
+            os.remove(os.path.join(pe_dir, f))
+            if os.path.exists(os.path.join(asm_dir, f + '.asm')):
+                os.remove(os.path.join(asm_dir, f + '.asm'))
+            if os.path.exists(os.path.join(cfg_dir, f + '.ida')):
+                os.remove(os.path.join(cfg_dir, f + '.ida'))
+            if os.path.exists(os.path.join(dot_dir, f + '.dot')):
+                os.remove(os.path.join(dot_dir, f + '.dot'))
+
+
+def generate_benign_csv():
+    benign_pe_dir = 'F:\\kkk\\dataset\\benign\\refind'
+    csv_out = 'F:\\kkk\\dataset\\benign_family.csv'
+    fieldnames = ['Id', 'Class']
+    with open(csv_out, "wb") as output_file:
+        writer = csv.DictWriter(output_file, fieldnames=fieldnames)
+        writer.writeheader()
+        for f in os.listdir(benign_pe_dir):
+            writer.writerow({fieldnames[0]: f, fieldnames[1]: '5'})
+
+
 if __name__ == '__main__':
+    generate_benign_csv()
+    # create_pixel_intensity()
     # create_dir()
     # change_max_item_lines()
     # subprocess.call('taskkill /im idaq64.exe /f')
-    # delete_error()
+    # delete_error_benign()
     # test()
     # delete_jsonl()
-    delete_all_local()
+    # delete_all_local()
     # check_json()
     # delete_pe()
 
